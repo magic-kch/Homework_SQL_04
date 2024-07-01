@@ -34,7 +34,7 @@ shop3 = Shop(id=3, name="Магазин 3")
 
 book1 = Book(id=1, title="Война и мир", author=author1)
 book2 = Book(id=2, title="Мцыри", author=author2)
-book3 = Book(id=3, title="Три мушка", author=author3)
+book3 = Book(id=3, title="Фаталист", author=author3)
 book4 = Book(id=4, title="Преступление и наказание", author=author4)
 book5 = Book(id=5, title="Белая гвардия", author=author5)
 book6 = Book(id=6, title="Идиот", author=author5)
@@ -62,12 +62,16 @@ session.add_all([sale1, sale2, sale3, sale4, sale5, sale6])
 session.commit()
 
 query = input('Введи фамилию автора или его id: ')
-for c in session.query(Book.title, Shop.name, Sale.price, Sale.date_sale)\
+res_query = session.query(Book.title, Shop.name, Sale.price, Sale.date_sale)\
         .join(Stock, Book.id == Stock.book_id)\
         .join(Shop, Stock.shop_id == Shop.id)\
         .join(Sale, Stock.id == Sale.stock_id)\
-        .join(Author, Book.author_id == Author.id)\
-        .filter(Author.name == query or Author.id == query).all():
+        .join(Author, Book.author_id == Author.id)
+if query.isdigit():
+    res_query = res_query.filter(Author.id == query).all()
+else:
+    res_query = res_query.filter(Author.name == query).all()
+for c in res_query:
     print(f"{c[0]} | {c[1]} | {c[2]} | {c[3]}")
 
 session.close()
